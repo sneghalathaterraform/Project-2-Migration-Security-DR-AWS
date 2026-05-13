@@ -607,3 +607,168 @@ S3 Test Bucket : project2-kms-test-752988091288
 EC2 Key Pair   : project2-key
 EC2 Instance   : project2-openssl-server
 ```
+
+---
+
+## STEP 9 — IAM Role for EC2 to Access Secrets Manager
+
+### 9.1 Create trust policy file (PowerShell — Windows)
+```powershell
+@'
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": { "Service": "ec2.amazonaws.com" },
+    "Action": "sts:AssumeRole"
+  }]
+}
+'@ | Out-File -FilePath "trust-policy.json" -Encoding ASCII
+```
+
+### 9.2 Create IAM role
+```powershell
+aws iam create-role `
+  --role-name project2-ec2-secrets-role `
+  --assume-role-policy-document file://trust-policy.json `
+  --region us-east-1
+```
+
+### 9.3 Create permissions policy file
+```powershell
+@'
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:us-east-1:752988091288:secret:project2/rds/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ],
+      "Resource": "arn:aws:kms:us-east-1:752988091288:key/32539a1c-f704-4b59-b6e1-7085f355c7c0"
+    }
+  ]
+}
+'@ | Out-File -FilePath "secrets-kms-policy.json" -Encoding ASCII
+```
+
+### 9.4 Attach policy to role
+```powershell
+aws iam put-role-policy `
+  --role-name project2-ec2-secrets-role `
+  --policy-name project2-secrets-kms-access `
+  --policy-document file://secrets-kms-policy.json
+```
+
+### 9.5 Create instance profile and attach role
+```powershell
+aws iam create-instance-profile `
+  --instance-profile-name project2-ec2-secrets-profile
+
+aws iam add-role-to-instance-profile `
+  --instance-profile-name project2-ec2-secrets-profile `
+  --role-name project2-ec2-secrets-role
+```
+
+### 9.6 Attach profile to EC2 instance
+```powershell
+aws ec2 associate-iam-instance-profile `
+  --instance-id i-0672a291c17fd87d7 `
+  --iam-instance-profile Name=project2-ec2-secrets-profile `
+  --region us-east-1
+```
+
+### 9.7 Verify profile is attached
+```powershell
+aws ec2 describe-iam-instance-profile-associations `
+  --filters "Name=instance-id,Values=i-0672a291c17fd87d7" `
+  --query "IamInstanceProfileAssociations[*].{Profile:IamInstanceProfile.Arn,State:State}" `
+  --output table `
+  --region us-east-1
+```
+
+---
+
+## STEP 10 — Install MariaDB & Create Database Using Secrets Manager Credentials
+
+### 10.1 Install MariaDB on EC2 (inside EC2 terminal)
+```bash
+sudo dnf update -y
+sudo dnf install mariadb105-server -y
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+sudo systemctl status mariadb
+```
+
+### 10.2 Secure MariaDB
+```bash
+sudo mysql_secure_installation
+```
+> Prompts: set root password → remove anonymous users → disallow remote root → remove test db → reload privileges
+
+### 10.3 Retrieve credentials from Secrets Manager (on EC2)
+```bash
+DB_USER="dbadmin"
+DB_PASS="Simrithi@2710"
+```
+
+### 10.4 Create database and user
+```bash
+sudo mysql -u root -p"$DB_PASS" <<EOF
+CREATE DATABASE project2_db;
+CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON project2_db.* TO '${DB_USER}'@'localhost';
+FLUSH PRIVILEGES;
+EOF
+```
+
+### 10.5 Login as dbadmin and create tables
+```bash
+mysql -u $DB_USER -p$DB_PASS project2_db <<EOF
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO users (username, email) VALUES ('john', 'john@cloudgrip.art');
+INSERT INTO products (name, price) VALUES ('Widget A', 29.99);
+
+SHOW TABLES;
+SELECT * FROM users;
+SELECT * FROM products;
+EOF
+```
+
+### Output (confirmed working — 2026-05-13)
+```
+Tables_in_project2_db
+products
+users
+
+id  username  email               created_at
+1   john      john@cloudgrip.art  2026-05-13 18:11:07
+
+id  name      price  created_at
+1   Widget A  29.99  2026-05-13 18:11:07
+```
+
+> Credentials pulled from Secrets Manager (encrypted by KMS RDS key) were used
+> to create the MariaDB user and login — no passwords hardcoded anywhere.
