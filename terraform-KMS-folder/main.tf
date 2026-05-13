@@ -13,11 +13,29 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
+locals {
+  kms_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootFullAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # ── KMS Key: S3 ─────────────────────────────────────────────
 resource "aws_kms_key" "s3" {
   description             = "KMS key for S3 encryption - Project2"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  policy                  = local.kms_policy
 
   tags = {
     Name    = "${var.project_name}-s3-kms-key"
@@ -35,6 +53,7 @@ resource "aws_kms_key" "ebs" {
   description             = "KMS key for EBS encryption - Project2"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  policy                  = local.kms_policy
 
   tags = {
     Name    = "${var.project_name}-ebs-kms-key"
@@ -52,6 +71,7 @@ resource "aws_kms_key" "rds" {
   description             = "KMS key for RDS encryption - Project2"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  policy                  = local.kms_policy
 
   tags = {
     Name    = "${var.project_name}-rds-kms-key"
