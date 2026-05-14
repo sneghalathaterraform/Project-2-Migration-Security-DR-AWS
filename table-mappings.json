@@ -1,0 +1,15 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "1",
+      "rule-name": "include-all",
+      "rule-action": "include",
+      "object-locator": {
+        "schema-name": "project2_db",
+        "table-name": "%"
+      },
+      "filters": []
+    }
+  ]
+}

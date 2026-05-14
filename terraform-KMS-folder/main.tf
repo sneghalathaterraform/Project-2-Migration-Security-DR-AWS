@@ -27,7 +27,7 @@ locals {
         Resource = "*"
       },
       {
-        Sid    = "AllowDMSAccess"
+        Sid    = "AllowDMSService"
         Effect = "Allow"
         Principal = {
           Service = "dms.amazonaws.com"
@@ -36,12 +36,28 @@ locals {
           "kms:Decrypt",
           "kms:DescribeKey",
           "kms:CreateGrant",
-          "kms:GenerateDataKey"
+          "kms:GenerateDataKey",
+          "kms:ReEncrypt*"
         ]
         Resource = "*"
       },
       {
-        Sid    = "AllowRDSAccess"
+        Sid    = "AllowDMSServerlessRole"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::752988091288:role/aws-service-role/dms.amazonaws.com/AWSServiceRoleForDMSServerless"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:CreateGrant",
+          "kms:GenerateDataKey",
+          "kms:ReEncrypt*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowRDSService"
         Effect = "Allow"
         Principal = {
           Service = "rds.amazonaws.com"
@@ -50,7 +66,8 @@ locals {
           "kms:Decrypt",
           "kms:DescribeKey",
           "kms:CreateGrant",
-          "kms:GenerateDataKey"
+          "kms:GenerateDataKey",
+          "kms:ReEncrypt*"
         ]
         Resource = "*"
       }
