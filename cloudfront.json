@@ -1,0 +1,42 @@
+{
+  "CallerReference": "project2-cf-2026",
+  "Aliases": {
+    "Quantity": 1,
+    "Items": ["cloudgrip.art"]
+  },
+  "DefaultRootObject": "index.html",
+  "Origins": {
+    "Quantity": 1,
+    "Items": [{
+      "Id": "project2-alb-origin",
+      "DomainName": "project2-alb-1595361429.us-east-1.elb.amazonaws.com",
+      "CustomOriginConfig": {
+        "HTTPPort": 80,
+        "HTTPSPort": 443,
+        "OriginProtocolPolicy": "http-only"
+      }
+    }]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "project2-alb-origin",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Quantity": 2,
+      "Items": ["GET", "HEAD"]
+    },
+    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+    "ForwardedValues": {
+      "QueryString": false,
+      "Cookies": { "Forward": "none" }
+    },
+    "MinTTL": 0
+  },
+  "ViewerCertificate": {
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:752988091288:certificate/6323ff0c-469c-450e-ac32-2cb61735ee87",
+    "SSLSupportMethod": "sni-only",
+    "MinimumProtocolVersion": "TLSv1.2_2021"
+  },
+  "WebACLId": "arn:aws:wafv2:us-east-1:752988091288:global/webacl/project2-waf-cloudfront/929784eb-5bff-4b67-9452-9759b4889915",
+  "Enabled": true,
+  "Comment": "Project2 CloudFront distribution"
+}
