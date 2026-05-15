@@ -1,0 +1,8 @@
+{
+  "SelectionName": "project2-resources",
+  "IamRoleArn": "arn:aws:iam::752988091288:role/project2-backup-role",
+  "Resources": [
+    "arn:aws:rds:us-east-1:752988091288:db:database-1",
+    "arn:aws:ec2:us-east-1:752988091288:volume/vol-0b44c9f3a32cb0382"
+  ]
+}

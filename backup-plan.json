@@ -1,0 +1,11 @@
+{
+  "BackupPlanName": "project2-backup-plan",
+  "Rules": [{
+    "RuleName": "daily-backup",
+    "TargetBackupVaultName": "project2-backup-vault",
+    "ScheduleExpression": "cron(0 2 * * ? *)",
+    "Lifecycle": {
+      "DeleteAfterDays": 7
+    }
+  }]
+}

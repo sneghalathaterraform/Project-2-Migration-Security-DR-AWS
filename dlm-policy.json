@@ -1,0 +1,22 @@
+{
+  "ExecutionRoleArn": "arn:aws:iam::752988091288:role/project2-dlm-role",
+  "Description": "Project2 EBS snapshot every 12 hours",
+  "State": "ENABLED",
+  "PolicyDetails": {
+    "PolicyType": "EBS_SNAPSHOT_MANAGEMENT",
+    "ResourceTypes": ["VOLUME"],
+    "TargetTags": [{"Key": "Project", "Value": "Project2"}],
+    "Schedules": [{
+      "Name": "every-12-hours",
+      "CreateRule": {
+        "Interval": 12,
+        "IntervalUnit": "HOURS",
+        "Times": ["02:00"]
+      },
+      "RetainRule": {
+        "Count": 3
+      },
+      "CopyTags": true
+    }]
+  }
+}
