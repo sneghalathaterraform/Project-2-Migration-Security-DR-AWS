@@ -1,0 +1,56 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Linux EC2 CPU Utilization",
+        "region": "us-east-1",
+        "metrics": [["AWS/EC2","CPUUtilization","InstanceId","i-0672a291c17fd87d7"]],
+        "period": 300,
+        "stat": "Average",
+        "view": "timeSeries"
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Windows EC2 CPU Utilization",
+        "region": "us-east-1",
+        "metrics": [["AWS/EC2","CPUUtilization","InstanceId","i-06c0ec14b446c870b"]],
+        "period": 300,
+        "stat": "Average",
+        "view": "timeSeries"
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "RDS CPU Utilization",
+        "region": "us-east-1",
+        "metrics": [["AWS/RDS","CPUUtilization","DBInstanceIdentifier","database-1"]],
+        "period": 300,
+        "stat": "Average",
+        "view": "timeSeries"
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "RDS Database Connections",
+        "region": "us-east-1",
+        "metrics": [["AWS/RDS","DatabaseConnections","DBInstanceIdentifier","database-1"]],
+        "period": 300,
+        "stat": "Average",
+        "view": "timeSeries"
+      }
+    }
+  ]
+}

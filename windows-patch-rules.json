@@ -1,0 +1,11 @@
+{
+  "PatchRules": [{
+    "PatchFilterGroup": {
+      "PatchFilters": [
+        {"Key": "MSRC_SEVERITY", "Values": ["Critical", "Important"]},
+        {"Key": "CLASSIFICATION", "Values": ["SecurityUpdates"]}
+      ]
+    },
+    "ApproveAfterDays": 7
+  }]
+}
