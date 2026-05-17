@@ -24,12 +24,7 @@
       "Quantity": 2,
       "Items": ["GET", "HEAD"]
     },
-    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
-    "ForwardedValues": {
-      "QueryString": false,
-      "Cookies": { "Forward": "none" }
-    },
-    "MinTTL": 0
+    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6"
   },
   "ViewerCertificate": {
     "ACMCertificateArn": "arn:aws:acm:us-east-1:752988091288:certificate/6323ff0c-469c-450e-ac32-2cb61735ee87",
